@@ -1,27 +1,61 @@
 pipeline {
     agent any
+   
     stages {
+
+        stage('Run Selenium Tests with pytest') {
+            steps {
+                    echo "Running Selenium Tests using pytest"
+
+                    // Install Python dependencies
+                    sh 'pip install -r requirements.txt'
+
+                    // ✅ Start Flask app in background
+                    sh 'start /B python app.py'
+
+                    // ⏱️ Wait a few seconds for the server to start
+                    sh 'ping 127.0.0.1 -n 5 > nul'
+
+                    // ✅ Run tests using pytest
+                    //bat 'pytest tests\\test_registrationapp.py --maxfail=1 --disable-warnings --tb=short'
+                    sh 'pytest -v'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t registration:v1 .'
+                echo "Build Docker Image"
+                sh "docker build -t seleniumdemoapp:v1 ."
             }
         }
-        stage('Push to Docker Hub') {
+        stage('Docker Login') {
             steps {
-                sh 'docker tag registration:v1 sriludone/registration:v1'
-                sh 'docker push sriludone/registration:v1'
+                  sh 'docker login -u bhavani765 -p bhanu@123'
+                }
+            }
+        stage('push Docker Image to Docker Hub') {
+            steps {
+                echo "push Docker Image to Docker Hub"
+                sh "docker tag seleniumdemoapp:v1 bhavani765/sample:seleniumtestimage"               
+                    
+                sh "docker push bhavani765/sample:seleniumtestimage"
+                
             }
         }
-        stage('Deploy to Kubernetes') {
-            steps {
-                sh 'kubectl apply -f D:/DevOps/week-2/deployment.yaml'
-                sh 'kubectl apply -f D:/DevOps/week-2/service.yaml'
-            }
+        stage('Deploy to Kubernetes') { 
+            steps { 
+                    // apply deployment & service 
+                    sh 'kubectl apply -f deployment.yaml --validate=false' 
+                    sh 'kubectl apply -f service.yaml' 
+            } 
         }
-        stage('Automated UI Test') {
-            steps {
-                sh 'python D:/DevOps/week-2/test_registration.py'
-            }
+    }
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Please check the logs.'
         }
     }
 }

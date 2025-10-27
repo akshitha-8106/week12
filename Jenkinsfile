@@ -11,7 +11,7 @@ pipeline {
                     sh 'python3 -m pip install -r requirements.txt'
 
                     // ✅ Start Flask app in background
-                    sh 'start /B python app.py'
+                    sh 'nohup python3 app.py &'
 
                     // ⏱️ Wait a few seconds for the server to start
                     sh 'ping 127.0.0.1 -n 5 > nul'

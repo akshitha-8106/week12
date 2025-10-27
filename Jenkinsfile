@@ -14,7 +14,7 @@ pipeline {
                     sh 'nohup python3 app.py &'
 
                     // ⏱️ Wait a few seconds for the server to start
-                    sh 'ping 127.0.0.1 -n 5 > nul'
+                    sh 'ping -c 5 127.0.0.1'
 
                     // ✅ Run tests using pytest
                     //bat 'pytest tests\\test_registrationapp.py --maxfail=1 --disable-warnings --tb=short'

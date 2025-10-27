@@ -18,7 +18,8 @@ pipeline {
 
                     // ✅ Run tests using pytest
                     //bat 'pytest tests\\test_registrationapp.py --maxfail=1 --disable-warnings --tb=short'
-                    sh 'pytest -v'
+                    sh 'python3 -m pytest -v'
+
             }
         }
 
